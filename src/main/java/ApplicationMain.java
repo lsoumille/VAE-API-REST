@@ -46,7 +46,7 @@ public class ApplicationMain extends JDialog
     public static void main(final String[] args)
     {
         new ApplicationMain();
-        new CryptoController(new CryptoService());
+        new KeyController(new KeyService());
         System.out.println("END MAIN");
     }
 }

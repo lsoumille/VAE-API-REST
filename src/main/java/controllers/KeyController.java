@@ -22,17 +22,36 @@ public class KeyController {
                 request.queryParams("keyname")
         ), JsonUtil.json());
 
+        //Create KeyPair URL
+        Spark.post("/keyPairs/:pin", (request, response) -> keyService.createKeyPair(
+                request.params(":pin"),
+                request.queryParams("keyname")
+        ), JsonUtil.json());
+
         //Get Key URL
         Spark.get("/keys/:pin/:keyname",(request, response) -> keyService.getKey(
                 request.params(":pin"),
                 request.params("keyname")
         ), JsonUtil.json());
 
-        //Delete Key URL
-        Spark.delete("/keys/:pin", (request, response) -> keyService.getKey(
+        //Get Key Pair URL
+        Spark.get("keyPairs/:pin/:keyname",(request, response) -> keyService.getKeyPair(
                 request.params(":pin"),
-                request.queryParams("keyname")
-        ));
+                request.params("keyname")
+        ), JsonUtil.json());
+
+        //Delete Key URL
+        Spark.delete("/keys/:pin/:keyname", (request, response) -> keyService.deleteKey(
+                request.params(":pin"),
+                request.params(":keyname")
+        ), JsonUtil.json());
+
+        //Delete Key Pair URL
+        Spark.delete("/keyPairs/:pin/:keyname", (request, response) -> keyService.deleteKeyPair(
+                request.params(":pin"),
+                request.params(":keyname")
+        ), JsonUtil.json());
+
 
         after((req, res) -> {
             res.type("application/json");

@@ -484,4 +484,36 @@ public class VAEHelper {
         int size = session.p11.C_DigestFinal(session.sessionHandle, result, 0, digestSize);
         return result;
     }
+    /*
+    public static long[] createKeyPair(Vpkcs11Session session, String publicKeyName, String privateKeyName) throws PKCS11Exception {
+        CK_MECHANISM mechanism = new CK_MECHANISM (CKM_RSA_PKCS_KEY_PAIR_GEN);
+        byte[] publicExponent = { 0x01, 0x00, 0x01, 0x00 };
+        int modulusBits = 2048;
+
+        CK_ATTRIBUTE[] publicKeyAttr = new CK_ATTRIBUTE[]
+                {
+                        new CK_ATTRIBUTE (CKA_LABEL, publicKeyName),
+                        new CK_ATTRIBUTE (CKA_CLASS, CKO_PUBLIC_KEY),
+                        new CK_ATTRIBUTE (CKA_ENCRYPT, true),
+                        new CK_ATTRIBUTE (CKA_SIGN, true),
+                        new CK_ATTRIBUTE (CKA_VERIFY, true),
+                        new CK_ATTRIBUTE (CKA_WRAP, true),
+                        new CK_ATTRIBUTE (CKA_TOKEN, true),
+                        new CK_ATTRIBUTE (CKA_PUBLIC_EXPONENT, publicExponent),
+                        new CK_ATTRIBUTE (CKA_MODULUS_BITS, modulusBits)
+                };
+
+        CK_ATTRIBUTE[] privateKeyAttr = new CK_ATTRIBUTE[]
+                {
+                        new CK_ATTRIBUTE (CKA_LABEL, privateKeyName),
+                        new CK_ATTRIBUTE (CKA_CLASS, CKO_PRIVATE_KEY),
+                        new CK_ATTRIBUTE (CKA_TOKEN, true),
+                        new CK_ATTRIBUTE (CKA_PRIVATE, true),
+                        new CK_ATTRIBUTE (CKA_SENSITIVE, true),
+                        new CK_ATTRIBUTE (CKA_DECRYPT, true),
+                        new CK_ATTRIBUTE (CKA_SIGN, true),
+                        new CK_ATTRIBUTE (CKA_UNWRAP, true)
+                };
+        return session.p11.C_GenerateKeyPair (session.sessionHandle, mechanism, publicKeyAttr, privateKeyAttr);
+    }*/
 }
