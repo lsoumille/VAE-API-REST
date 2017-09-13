@@ -1,8 +1,10 @@
 /**
  * Created by Thales on 12/09/2017.
  */
+import controllers.CryptoController;
 import controllers.KeyController;
 import controllers.UserController;
+import services.CryptoService;
 import services.KeyService;
 import services.UserService;
 
@@ -44,7 +46,7 @@ public class ApplicationMain extends JDialog
     public static void main(final String[] args)
     {
         new ApplicationMain();
-        new KeyController(new KeyService());
+        new CryptoController(new CryptoService());
         System.out.println("END MAIN");
     }
 }

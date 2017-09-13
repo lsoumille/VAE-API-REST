@@ -17,17 +17,17 @@ public class CryptoController {
     public CryptoController(final CryptoService cryptoService) {
 
         //Encryption URL
-        Spark.post("/crypt/:pin/", (request, response) -> cryptoService.encryptMessage(
+        Spark.post("/crypt/:pin", (request, response) -> cryptoService.encryptMessage(
                 request.params(":pin"),
                 request.queryParams("keyname"),
                 request.queryParams("message")
         ), JsonUtil.json());
 
         //Decryption URL
-        Spark.get("/decrypt/:pin/:keyname/:cryptedData",(request, response) -> cryptoService.decryptMessage(
+        Spark.post("/decrypt/:pin",(request, response) -> cryptoService.decryptMessage(
                 request.params(":pin"),
-                request.params(":keyname"),
-                request.params(":cryptedData")
+                request.queryParams("keyname"),
+                request.queryParams("message")
         ), JsonUtil.json());
 
         //Digest URL
@@ -35,7 +35,7 @@ public class CryptoController {
                 request.params(":pin"),
                 request.queryParams("keyname"),
                 request.queryParams("message")
-        ));
+        ), JsonUtil.json());
 
         after((req, res) -> {
             res.type("application/json");

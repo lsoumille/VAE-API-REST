@@ -2,11 +2,9 @@ package utils;
 
 import sun.security.pkcs11.wrapper.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.util.*;
 
 import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
@@ -432,5 +430,58 @@ public class VAEHelper {
             }
         }
         PKCS11ConstantNames = cNames;
+    }
+
+    public static byte[] encryptBuf(Vpkcs11Session session, CK_MECHANISM encMech, long keyID, byte[] plainBytes) throws PKCS11Exception, IOException {
+        byte[] encryptedText;
+        int encryptedDataLen = 0;
+        byte[] outText = {};
+
+        int plainBytesLen = plainBytes.length;
+        session.p11.C_EncryptInit(session.sessionHandle, encMech, keyID);
+        System.out.println("C_EncryptInit success.");
+
+        encryptedDataLen = session.p11.C_Encrypt(session.sessionHandle, plainBytes, 0, plainBytesLen, outText, 0, 0);
+        System.out.println("C_Encrypt success. Encrypted data len = " + encryptedDataLen);
+
+        encryptedText = new byte[encryptedDataLen];
+        encryptedDataLen = session.p11.C_Encrypt(session.sessionHandle, plainBytes, 0, plainBytesLen, encryptedText, 0, encryptedDataLen);
+        System.out.println("C_Encrypt 2nd call succeed. Encrypted data len = " + encryptedDataLen);
+        return encryptedText;
+    }
+
+
+    public static byte[] decryptBuf(Vpkcs11Session session, CK_MECHANISM encMech, long keyID, byte[] encryptedBytes) throws PKCS11Exception, IOException {
+        byte[] decryptedBytes;
+        byte[] decryptedData;
+        int encryptedDataLen = encryptedBytes.length;
+        int decryptedDataLen = 0;
+        byte[] outText = {};
+        System.out.println("Start Decryption");
+        session.p11.C_DecryptInit(session.sessionHandle, encMech, keyID);
+        System.out.println("C_DecryptInit success.");
+
+        decryptedDataLen = session.p11.C_Decrypt(session.sessionHandle, encryptedBytes, 0, encryptedDataLen, outText, 0, 0);
+        System.out.println("C_Decrypt success. Decrypted data length = " + decryptedDataLen);
+
+        decryptedData = new byte[decryptedDataLen];
+        decryptedDataLen = session.p11.C_Decrypt(session.sessionHandle, encryptedBytes, 0, encryptedDataLen, decryptedData, 0, decryptedDataLen);
+        System.out.println("C_Decrypt 2nd call succeed. Decrypted data length = " + decryptedDataLen);
+
+        decryptedBytes = new byte[decryptedDataLen];
+        System.arraycopy(decryptedData, 0, decryptedBytes, 0, decryptedDataLen);
+        return decryptedBytes;
+    }
+
+    public static byte[] digest(Vpkcs11Session session, CK_MECHANISM mech, int digestSize, byte[] input, long key) throws Exception {
+        byte[] result = null;
+        session.p11.C_DigestInit(session.sessionHandle, mech);
+        if (key != 0) {
+            session.p11.C_DigestKey(session.sessionHandle, key);
+        }
+        session.p11.C_DigestUpdate(session.sessionHandle, 0, input, 0, input.length);
+        result = new byte[digestSize];
+        int size = session.p11.C_DigestFinal(session.sessionHandle, result, 0, digestSize);
+        return result;
     }
 }
