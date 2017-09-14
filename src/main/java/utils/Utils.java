@@ -11,4 +11,6 @@ public class Utils {
         }
         return result;
     }
+
+    public static FrameLogger logger = new FrameLogger();
 }

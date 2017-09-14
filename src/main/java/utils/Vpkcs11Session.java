@@ -7,5 +7,5 @@ import sun.security.pkcs11.wrapper.PKCS11;
  */
 public class Vpkcs11Session {
     public PKCS11 p11;
-    long   sessionHandle;
+    public long   sessionHandle;
 }

@@ -2,11 +2,14 @@ package services;
 
 import business.Message;
 import sun.security.pkcs11.wrapper.CK_MECHANISM;
+import utils.Base64Helper;
 import utils.Utils;
 import utils.VAEHelper;
 import utils.Vpkcs11Session;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
 
@@ -35,7 +38,7 @@ public class CryptoService {
         byte[] plainBytes = messageToEncrypt.getBytes();
         try {
             byte[] encryptedBytes = VAEHelper.encryptBuf(session, encMechCbcPad, keyID, plainBytes);
-            return new Message(new String(encryptedBytes, Charset.forName("UTF-8")));
+            return new Message(Base64Helper.byteArrayToString(encryptedBytes));
         } catch (Exception e) {
             throw new RuntimeException("Encryption process does not work");
         }
@@ -47,10 +50,10 @@ public class CryptoService {
         if (keyID == 0) {
             throw new IllegalArgumentException("Key does not exist");
         }
-        byte[] encryptedBytes = encryptedMessage.getBytes();
+        byte[] encryptedBytes = Base64Helper.stringToByteArray(encryptedMessage);
         try {
             byte[] plainBytes = VAEHelper.decryptBuf(session, encMechCbcPad, keyID, encryptedBytes);
-            return new Message(new String(plainBytes, Charset.forName("ASCII")));
+            return new Message(new String(plainBytes));
         } catch (Exception e) {
             throw new RuntimeException("Encryption process does not work");
         }
@@ -69,6 +72,41 @@ public class CryptoService {
             return new Message(Utils.toHex(hashBytes));
         } catch (Exception e) {
             throw new RuntimeException("Digest process does not work");
+        }
+    }
+
+    public Message signMessage(String pinCode, String keyName, String messageToSign) {
+        Vpkcs11Session session = VAEHelper.startUp(VAEHelper.getPKCS11LibPath(null), pinCode);
+
+        //2048 is used because of RSA2048
+        CK_MECHANISM signMech = new CK_MECHANISM (CKM_RSA_PKCS);
+
+        long keyID = VAEHelper.findKey(session, keyName, CKO_PRIVATE_KEY);
+        if (keyID == 0) {
+            throw new IllegalArgumentException("Private key does not exist");
+        }
+        try {
+            byte[] signature = VAEHelper.sign(session, signMech, messageToSign, keyID);
+            return new Message(Base64Helper.byteArrayToString(signature));
+        } catch (Exception e) {
+            throw new RuntimeException("Signing process does not work");
+        }
+    }
+
+    public Message verifySignature(String pinCode, String keyName, String message, String signature) {
+        Vpkcs11Session session = VAEHelper.startUp(VAEHelper.getPKCS11LibPath(null), pinCode);
+
+        //2048 is used because of RSA2048
+        CK_MECHANISM signMech = new CK_MECHANISM (CKM_RSA_PKCS);
+
+        long keyID = VAEHelper.findKey(session, keyName, CKO_PUBLIC_KEY);
+        if (keyID == 0) {
+            throw new IllegalArgumentException("Public key does not exist");
+        }
+        try {
+            return new Message(Boolean.toString(VAEHelper.verifySignature(session, signMech, message, Base64Helper.stringToByteArray(signature), keyID)));
+        } catch (Exception e) {
+            throw new RuntimeException("Verifying signature does not work");
         }
     }
 }

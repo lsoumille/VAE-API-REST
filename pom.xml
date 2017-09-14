@@ -107,13 +107,13 @@
                         <configuration>
                             <headerType>gui</headerType>
                             <jar>${project.build.directory}/${artifactId}-${version}-shaded.jar</jar>
-                            <outfile>${project.build.directory}/howtodoinjava.exe</outfile>
+                            <outfile>${project.build.directory}/VAERestAPI.exe</outfile>
                             <downloadUrl>http://java.com/download</downloadUrl>
                             <classPath>
                                 <mainClass>ApplicationMain</mainClass>
                                 <preCp>anything</preCp>
                             </classPath>
-                            <!--<icon>application.ico</icon>-->
+                            <icon>logo.ico</icon>
                             <jre>
                                 <minVersion>1.8.0</minVersion>
                                 <jdkPreference>preferJre</jdkPreference>
@@ -122,13 +122,13 @@
                                 <fileVersion>1.0.0.0</fileVersion>
                                 <txtFileVersion>${project.version}</txtFileVersion>
                                 <fileDescription>${project.name}</fileDescription>
-                                <copyright>2012 howtodoinjava.com</copyright>
+                                <copyright>2017 Thales Services</copyright>
                                 <productVersion>1.0.0.0</productVersion>
                                 <txtProductVersion>1.0.0.0</txtProductVersion>
                                 <productName>${project.name}</productName>
-                                <companyName>howtodoinjava.com</companyName>
-                                <internalName>howtodoinjava</internalName>
-                                <originalFilename>howtodoinjava.exe</originalFilename>
+                                <companyName>Thales Services</companyName>
+                                <internalName>Thales Services</internalName>
+                                <originalFilename>VAERestAPI.exe</originalFilename>
                             </versionInfo>
                         </configuration>
                     </execution>

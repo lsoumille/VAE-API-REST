@@ -5,6 +5,7 @@ import sun.security.pkcs11.wrapper.*;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
@@ -67,13 +68,13 @@ public class VAEHelper {
         }
         catch (PKCS11Exception e)
         {
-            System.out.println (e.getMessage());
+            Utils.logger.println(e.getMessage());
             e.printStackTrace();
         }
         catch (Exception e)
         {
-            System.out.println ("Exception thrown.");
-            System.out.println (e.getMessage());
+            Utils.logger.println("Exception thrown.");
+            Utils.logger.println(e.getMessage());
             e.printStackTrace();
         }
         return 0;
@@ -108,13 +109,13 @@ public class VAEHelper {
         }
         catch (PKCS11Exception e)
         {
-            System.out.println (e.getMessage());
+            Utils.logger.println(e.getMessage());
             e.printStackTrace();
         }
         catch (Exception e)
         {
-            System.out.println ("Exception thrown.");
-            System.out.println (e.getMessage());
+            Utils.logger.println("Exception thrown.");
+            Utils.logger.println(e.getMessage());
             e.printStackTrace();
         }
         return 0;
@@ -154,7 +155,7 @@ public class VAEHelper {
 
                 if ((path == null )|| (path.equals("")))
                 {
-                    System.out.println ("Cannot find Vormetric PKCS11 library, please install Vormetric key agent. " );
+                    Utils.logger.println("Cannot find Vormetric PKCS11 library, please install Vormetric key agent. " );
                     System.exit(4);
                 }
             }
@@ -166,12 +167,12 @@ public class VAEHelper {
                 }
                 else
                 {
-                    System.out.println ("VPKCS11LIBPATH point to a file that does not exist: " + path);
+                    Utils.logger.println("VPKCS11LIBPATH point to a file that does not exist: " + path);
                     System.exit(4);
                 }
             }
         }
-        System.out.println ("Loading the Vormetric PKCS11 library from : " + path);
+        Utils.logger.println("Loading the Vormetric PKCS11 library from : " + path);
         return  path;
     }
 
@@ -198,8 +199,8 @@ public class VAEHelper {
         }
         catch (Exception e)
         {
-            System.out.println ("Exception thrown.");
-            System.out.println (e.getMessage());
+            Utils.logger.println("Exception thrown.");
+            Utils.logger.println(e.getMessage());
         }
 
         return match;
@@ -219,7 +220,7 @@ public class VAEHelper {
         month = String.valueOf(cal.get(Calendar.MONTH)+1); // Calendar is zero based!
         day = String.valueOf(cal.get(Calendar.DAY_OF_MONTH));
 
-        System.out.println("Current End Date: year: "+ year+ " month: "+ month+ " day: "+day);
+        Utils.logger.println("Current End Date: year: "+ year+ " month: "+ month+ " day: "+day);
         CK_DATE endDate = new CK_DATE(year.toCharArray(), month.toCharArray(), day.toCharArray());
 
         CK_ATTRIBUTE[] publicKeyAttr = new CK_ATTRIBUTE[]
@@ -258,7 +259,7 @@ public class VAEHelper {
 
     public static void deleteKey(Vpkcs11Session session, long keyId) throws PKCS11Exception {
         session.p11.C_DestroyObject (session.sessionHandle, keyId);
-        System.out.println ("Successfully deleted the key from DSM.");
+        Utils.logger.println("Successfully deleted the key from DSM.");
     }
 
     public static long createKey(Vpkcs11Session session, String keyName)
@@ -276,7 +277,7 @@ public class VAEHelper {
             month = String.valueOf(cal.get(Calendar.MONTH)+1); // Calendar is zero based!
             day = String.valueOf(cal.get(Calendar.DAY_OF_MONTH));
 
-            System.out.println("Current End Date: year: "+ year+ " month: "+ month+ " day: "+day);
+            Utils.logger.println("Current End Date: year: "+ year+ " month: "+ month+ " day: "+day);
             CK_DATE endDate = new CK_DATE(year.toCharArray(), month.toCharArray(), day.toCharArray());
             CK_MECHANISM mechanism = new CK_MECHANISM (CKM_AES_KEY_GEN);
 
@@ -302,9 +303,9 @@ public class VAEHelper {
                             new CK_ATTRIBUTE (CKA_END_DATE, endDate),
                     };
 
-            System.out.println ("Before generating Key. Key Handle: " + keyID);
+            Utils.logger.println("Before generating Key. Key Handle: " + keyID);
             keyID = session.p11.C_GenerateKey (session.sessionHandle, mechanism, attrs);
-            System.out.println ("Key successfully Generated. Key Handle: " + keyID);
+            Utils.logger.println("Key successfully Generated. Key Handle: " + keyID);
         }
         catch (PKCS11Exception e)
         {
@@ -345,7 +346,7 @@ public class VAEHelper {
                     };
 
             keyID = session.p11.C_CreateObject(session.sessionHandle, attrs);
-            System.out.println("Object successfully created. Object Handle: " + keyID);
+            Utils.logger.println("Object successfully created. Object Handle: " + keyID);
         } catch (PKCS11Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -364,20 +365,20 @@ public class VAEHelper {
             loadConstantNames();
 
             session.sessionHandle = session.p11.C_OpenSession (slots[0], 0,  null, null);
-            System.out.println ("Session successfully opened. Handle: " + session.sessionHandle);
+            Utils.logger.println("Session successfully opened. Handle: " + session.sessionHandle);
             session.p11.C_Login (session.sessionHandle, CKU_USER, pin.toCharArray());
-            System.out.println ("Successfully Logged in");
+            Utils.logger.println("Successfully Logged in");
             return session;
         }
         catch (PKCS11Exception e)
         {
-            System.out.println (e.getMessage());
+            Utils.logger.println(e.getMessage());
             e.printStackTrace();
         }
         catch (Exception e)
         {
-            System.out.println ("Exception thrown.");
-            System.out.println (e.getMessage());
+            Utils.logger.println("Exception thrown.");
+            Utils.logger.println(e.getMessage());
         }
         return null;
     }
@@ -388,19 +389,19 @@ public class VAEHelper {
         try
         {
             session.p11.C_Logout(session.sessionHandle);
-            System.out.println ("Successfully logged out.");
+            Utils.logger.println("Successfully logged out.");
             session.p11.C_CloseSession (session.sessionHandle);
-            System.out.println ("Successfully closed session.");
+            Utils.logger.println("Successfully closed session.");
         }
         catch (PKCS11Exception e)
         {
-            System.out.println (e.getMessage());
+            Utils.logger.println(e.getMessage());
             e.printStackTrace();
         }
         catch (Exception e)
         {
-            System.out.println ("Exception thrown.");
-            System.out.println (e.getMessage());
+            Utils.logger.println("Exception thrown.");
+            Utils.logger.println(e.getMessage());
         }
     }
 
@@ -425,7 +426,7 @@ public class VAEHelper {
                     // System.out.println("Putting: "+fieldName+" with "+field.get(null));
                 } catch(IllegalAccessException iae)
                 {
-                    System.out.println(iae.getMessage());
+                    Utils.logger.println(iae.getMessage());
                 }
             }
         }
@@ -439,14 +440,14 @@ public class VAEHelper {
 
         int plainBytesLen = plainBytes.length;
         session.p11.C_EncryptInit(session.sessionHandle, encMech, keyID);
-        System.out.println("C_EncryptInit success.");
+        Utils.logger.println("C_EncryptInit success.");
 
         encryptedDataLen = session.p11.C_Encrypt(session.sessionHandle, plainBytes, 0, plainBytesLen, outText, 0, 0);
-        System.out.println("C_Encrypt success. Encrypted data len = " + encryptedDataLen);
+        Utils.logger.println("C_Encrypt success. Encrypted data len = " + encryptedDataLen);
 
         encryptedText = new byte[encryptedDataLen];
         encryptedDataLen = session.p11.C_Encrypt(session.sessionHandle, plainBytes, 0, plainBytesLen, encryptedText, 0, encryptedDataLen);
-        System.out.println("C_Encrypt 2nd call succeed. Encrypted data len = " + encryptedDataLen);
+        Utils.logger.println("C_Encrypt 2nd call succeed. Encrypted data len = " + encryptedDataLen);
         return encryptedText;
     }
 
@@ -457,16 +458,16 @@ public class VAEHelper {
         int encryptedDataLen = encryptedBytes.length;
         int decryptedDataLen = 0;
         byte[] outText = {};
-        System.out.println("Start Decryption");
+        Utils.logger.println("Start Decryption");
         session.p11.C_DecryptInit(session.sessionHandle, encMech, keyID);
-        System.out.println("C_DecryptInit success.");
+        Utils.logger.println("C_DecryptInit success.");
 
         decryptedDataLen = session.p11.C_Decrypt(session.sessionHandle, encryptedBytes, 0, encryptedDataLen, outText, 0, 0);
-        System.out.println("C_Decrypt success. Decrypted data length = " + decryptedDataLen);
+        Utils.logger.println("C_Decrypt success. Decrypted data length = " + decryptedDataLen);
 
         decryptedData = new byte[decryptedDataLen];
         decryptedDataLen = session.p11.C_Decrypt(session.sessionHandle, encryptedBytes, 0, encryptedDataLen, decryptedData, 0, decryptedDataLen);
-        System.out.println("C_Decrypt 2nd call succeed. Decrypted data length = " + decryptedDataLen);
+        Utils.logger.println("C_Decrypt 2nd call succeed. Decrypted data length = " + decryptedDataLen);
 
         decryptedBytes = new byte[decryptedDataLen];
         System.arraycopy(decryptedData, 0, decryptedBytes, 0, decryptedDataLen);
@@ -484,36 +485,21 @@ public class VAEHelper {
         int size = session.p11.C_DigestFinal(session.sessionHandle, result, 0, digestSize);
         return result;
     }
-    /*
-    public static long[] createKeyPair(Vpkcs11Session session, String publicKeyName, String privateKeyName) throws PKCS11Exception {
-        CK_MECHANISM mechanism = new CK_MECHANISM (CKM_RSA_PKCS_KEY_PAIR_GEN);
-        byte[] publicExponent = { 0x01, 0x00, 0x01, 0x00 };
-        int modulusBits = 2048;
 
-        CK_ATTRIBUTE[] publicKeyAttr = new CK_ATTRIBUTE[]
-                {
-                        new CK_ATTRIBUTE (CKA_LABEL, publicKeyName),
-                        new CK_ATTRIBUTE (CKA_CLASS, CKO_PUBLIC_KEY),
-                        new CK_ATTRIBUTE (CKA_ENCRYPT, true),
-                        new CK_ATTRIBUTE (CKA_SIGN, true),
-                        new CK_ATTRIBUTE (CKA_VERIFY, true),
-                        new CK_ATTRIBUTE (CKA_WRAP, true),
-                        new CK_ATTRIBUTE (CKA_TOKEN, true),
-                        new CK_ATTRIBUTE (CKA_PUBLIC_EXPONENT, publicExponent),
-                        new CK_ATTRIBUTE (CKA_MODULUS_BITS, modulusBits)
-                };
+    public static byte[] sign(Vpkcs11Session session, CK_MECHANISM signMech, String signText, long privatekeyID) throws PKCS11Exception {
+        session.p11.C_SignInit (session.sessionHandle, signMech, privatekeyID);
+        byte[] signature = session.p11.C_Sign (session.sessionHandle, signText.getBytes());
+        Utils.logger.println("Successfully signed. Text to sign = " + signText + " signature = " + Base64Helper.byteArrayToString(signature));
+        return signature;
+    }
 
-        CK_ATTRIBUTE[] privateKeyAttr = new CK_ATTRIBUTE[]
-                {
-                        new CK_ATTRIBUTE (CKA_LABEL, privateKeyName),
-                        new CK_ATTRIBUTE (CKA_CLASS, CKO_PRIVATE_KEY),
-                        new CK_ATTRIBUTE (CKA_TOKEN, true),
-                        new CK_ATTRIBUTE (CKA_PRIVATE, true),
-                        new CK_ATTRIBUTE (CKA_SENSITIVE, true),
-                        new CK_ATTRIBUTE (CKA_DECRYPT, true),
-                        new CK_ATTRIBUTE (CKA_SIGN, true),
-                        new CK_ATTRIBUTE (CKA_UNWRAP, true)
-                };
-        return session.p11.C_GenerateKeyPair (session.sessionHandle, mechanism, publicKeyAttr, privateKeyAttr);
-    }*/
+    public static boolean verifySignature(Vpkcs11Session session, CK_MECHANISM signMech, String message, byte[] signature, long publicKeyID) throws PKCS11Exception {
+        session.p11.C_VerifyInit (session.sessionHandle, signMech, publicKeyID);
+        try {
+            session.p11.C_Verify(session.sessionHandle, message.getBytes(), signature);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
 }

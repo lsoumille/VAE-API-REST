@@ -7,6 +7,7 @@ import controllers.UserController;
 import services.CryptoService;
 import services.KeyService;
 import services.UserService;
+import utils.Utils;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -14,25 +15,21 @@ import java.awt.Frame;
 import java.awt.Label;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import javax.swing.JDialog;
+import javax.swing.*;
 
 public class ApplicationMain extends JDialog
 {
     private static final long serialVersionUID = 1L;
+
     public ApplicationMain()
     {
         //Create a frame
         Frame f = new Frame();
         f.setSize(500, 300);
-
-        //Prepare font
-        Font font = new Font( "SansSerif", Font.PLAIN, 22 );
+        f.setTitle("VAE Rest API");
 
         //Write something
-        Label label = new Label("Launch4j Maven Demo with HowToDoInJava.com");
-        label.setForeground(Color.RED);
-        label.setFont(font);
-        f.add(label);
+        f.add(Utils.logger.getSp());
 
         //Make visible
         f.setVisible(true);
@@ -45,8 +42,24 @@ public class ApplicationMain extends JDialog
     }
     public static void main(final String[] args)
     {
-        new ApplicationMain();
-        new KeyController(new KeyService());
+        Thread ui = new Thread() {
+            public void run() {
+                new ApplicationMain();
+            }
+        };
+        Thread keyManager = new Thread() {
+            public void run() {
+                new CryptoController(new CryptoService());
+            }
+        };
+        Thread cryptoManager = new Thread() {
+            public void run() {
+                new KeyController(new KeyService());
+            }
+        };
+        ui.start();
+        keyManager.start();
+        cryptoManager.start();
         System.out.println("END MAIN");
     }
 }

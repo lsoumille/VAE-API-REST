@@ -38,17 +38,18 @@ public class CryptoController {
         ), JsonUtil.json());
 
         //Signature URL
-        Spark.post("signature/:pin",(request, response) -> cryptoService.digestMessage(
+        Spark.post("signature/:pin",(request, response) -> cryptoService.signMessage(
                 request.params(":pin"),
                 request.queryParams("keyname"),
                 request.queryParams("message")
         ), JsonUtil.json());
 
         //Verify URL
-        Spark.post("verify/:pin",(request, response) -> cryptoService.digestMessage(
+        Spark.post("verify/:pin",(request, response) -> cryptoService.verifySignature(
                 request.params(":pin"),
                 request.queryParams("keyname"),
-                request.queryParams("message")
+                request.queryParams("message"),
+                request.queryParams("signature")
         ), JsonUtil.json());
 
         after((req, res) -> {
