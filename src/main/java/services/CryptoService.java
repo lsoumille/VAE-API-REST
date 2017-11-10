@@ -18,7 +18,7 @@ import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
  */
 public class CryptoService {
 
-    public static final byte[] iv = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x10, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
+    public static final byte[] iv = {0x71, 0x77, 0x65, 0x72, 0x74, 0x79, 0x61, 0x73, 0x64, 0x66, 0x67, 0x68, 0x7A, 0x78, 0x63, 0x76};
 
     public static final CK_MECHANISM encMechCbcPad = new CK_MECHANISM (CKM_AES_CBC_PAD, iv);
     public static final CK_MECHANISM encMechCtr    = new CK_MECHANISM (CKM_AES_CTR    , iv);
@@ -55,7 +55,7 @@ public class CryptoService {
             byte[] plainBytes = VAEHelper.decryptBuf(session, encMechCbcPad, keyID, encryptedBytes);
             return new Message(new String(plainBytes));
         } catch (Exception e) {
-            throw new RuntimeException("Encryption process does not work");
+            throw new RuntimeException("Decryption process does not work");
         }
     }
 
