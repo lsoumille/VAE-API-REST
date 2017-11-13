@@ -2,9 +2,12 @@ package services;
 
 import business.AppUser;
 import business.Message;
+import sun.security.pkcs11.wrapper.PKCS11Exception;
 import utils.Base64Helper;
 import utils.VAEHelper;
 import utils.Vpkcs11Session;
+
+import java.io.IOException;
 
 import static services.CryptoService.encMechCbcPad;
 
@@ -65,16 +68,39 @@ public class AppUserService {
 
         byte[] encryptedFirstnameBytes = Base64Helper.stringToByteArray(encryptedFirstname);
         byte[] encryptedLastnameBytes = Base64Helper.stringToByteArray(encryptedLastname);
-        byte[] encryptedAddressBytes = Base64Helper.stringToByteArray(encryptedAddress);
-        byte[] encryptedCityBytes = Base64Helper.stringToByteArray(encryptedCity);
+
+        byte[] firstnameBytes = new byte[]{};
+        byte[] lastnameBytes = new byte[]{};
         try {
-            byte[] firstnameBytes = VAEHelper.decryptBuf(session, encMechCbcPad, keyID, encryptedFirstnameBytes);
-            byte[] lastnameBytes = VAEHelper.decryptBuf(session, encMechCbcPad, keyID, encryptedLastnameBytes);
-            byte[] addressBytes = VAEHelper.decryptBuf(session, encMechCbcPad, keyID, encryptedAddressBytes);
-            byte[] cityBytes = VAEHelper.decryptBuf(session, encMechCbcPad, keyID, encryptedCityBytes);
-            return new AppUser(new String(firstnameBytes), new String(lastnameBytes), new String(addressBytes), new String(cityBytes));
+            firstnameBytes = VAEHelper.decryptBuf(session, encMechCbcPad, keyID, encryptedFirstnameBytes);
+            lastnameBytes = VAEHelper.decryptBuf(session, encMechCbcPad, keyID, encryptedLastnameBytes);
         } catch (Exception e) {
             throw new RuntimeException("Decryption process does not work");
         }
+
+        byte[] addressBytes = new byte[]{};
+        if (encryptedAddress != null) {
+            byte[] encryptedAddressBytes = Base64Helper.stringToByteArray(encryptedAddress);
+            try {
+                addressBytes = VAEHelper.decryptBuf(session, encMechCbcPad, keyID, encryptedAddressBytes);
+            } catch (PKCS11Exception e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        byte[] cityBytes = new byte[]{};
+        if (encryptedCity != null) {
+            byte[] encryptedCityBytes = Base64Helper.stringToByteArray(encryptedCity);
+            try {
+                cityBytes = VAEHelper.decryptBuf(session, encMechCbcPad, keyID, encryptedCityBytes);
+            } catch (PKCS11Exception e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return new AppUser(new String(firstnameBytes), new String(lastnameBytes), new String(addressBytes), new String(cityBytes));
     }
 }
